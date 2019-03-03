@@ -1,0 +1,19 @@
+{
+  "name": "persona5",
+  "version": "1.0.0",
+  "description": "Persona 5 style font generator",
+  "main": "src/index.ts",
+  "repository": "https://github.com/LzxHahaha/persona5.git",
+  "author": "LzxHahaha <lzxglhf@live.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "parcel serve src/index.html",
+    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url ."
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "parcel": "^1.11.0",
+    "typescript": "^3.3.3333"
+  }
+}
