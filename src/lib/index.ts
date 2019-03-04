@@ -1,6 +1,6 @@
 import * as _ from './utils';
 
-const MAX_ANGLE = 5;
+const MAX_ANGLE = 3;
 
 enum COLORS {
     RED = '#DA4C23',
@@ -15,7 +15,7 @@ enum CHAR_MODE {
 };
 
 interface BoxChar {
-    char: string,
+    charImage: HTMLImageElement,
     width: number,
     height: number,
     angle: number,
@@ -25,8 +25,8 @@ interface BoxChar {
 }
 
 interface BoxTextOptions {
-    fontSize?: number | null,
-    fontFamily?: string | null
+    fontSize?: number,
+    fontFamily?: string
 }
 
 export default class BoxText {
@@ -49,41 +49,41 @@ export default class BoxText {
         }
 
         const chars = text.toUpperCase().split('');
+        const modes = new Array<number>(chars.length).fill(CHAR_MODE.WHITE);
+        modes[0] = CHAR_MODE.FIRST;
+        // 随机选择标红的字，一定范围内只允许出现一次
+        for (let i = 1; i < this.chars.length; i += 7) {
+            for (let j = i; j < i + 6 && j < this.chars.length; ++j) {
+                if (Math.random() * 10 > 5) {
+                    modes[j] = CHAR_MODE.RED;
+                    break;
+                }
+            }
+        }
 
         for (const [index, char] of chars.entries()) {
-            // TODO: 更改高度计算方式
-            const width = _.getCharWidth(char, this.font);
-            const height = width * 1.2;
 
-            let scale = 1.5, offset = 0, mode = CHAR_MODE.FIRST;
+            let scale = 1.5, offset = 0, fontSize = this.fontSize * 1.5;
             let angle = -(Math.round(Math.random() * 10) % MAX_ANGLE);
             if (index > 0) {
                 scale = 1 - Math.floor(Math.random() * 10) % 3 / 10;
                 offset = Math.floor(Math.random() * 100) % 50 / 100 * _.randomOp();
-                mode = CHAR_MODE.WHITE;
                 angle *= _.randomOp();
+                fontSize *= scale;
             }
+            let color = modes[index] === CHAR_MODE.RED ? COLORS.RED : COLORS.WHITE;
+            const { width, height, image: charImage } = _.textToImage(char, fontSize, color, this.fontFamily, 'bold');
 
             const boxChar: BoxChar = {
-                char,
+                charImage,
                 width,
                 height,
                 angle,
                 scale,
                 offset,
-                mode
+                mode: modes[index]
             };
             this.chars.push(boxChar);
-        }
-
-        // 随机选择标红的字，一定范围内只允许出现一次
-        for (let i = 1; i < this.chars.length; i += 7) {
-            for (let j = i; j < i + 6 && j < this.chars.length; ++j) {
-                if (Math.random() * 10 > 5) {
-                    this.chars[j].mode = CHAR_MODE.RED;
-                    break;
-                }
-            }
         }
     }
 
@@ -123,17 +123,17 @@ export default class BoxText {
         for (const boxChar of this.chars) {
             ctx.save();
 
-            let { char, width, height, angle, scale, offset, mode } = boxChar;
+            let { charImage, width, height, angle, scale, offset, mode } = boxChar;
             ctx.scale(scale, scale);
             
             if (mode == CHAR_MODE.FIRST) {
                 const BOX_SCALE = 1.5;
-                _.canvasRotate(canvas, ctx, angle - 3);
+                // _.canvasRotate(canvas, ctx, angle - 3);
                 const borderWidth = width * 1.5, borderHeight = height * BOX_SCALE;
                 ctx.fillStyle = COLORS.BLACK;
                 ctx.fillRect(left, pendding, borderWidth, borderHeight);
 
-                _.canvasRotate(canvas, ctx, 1.5);
+                // _.canvasRotate(canvas, ctx, 1.5);
                 const bgScale = BOX_SCALE - 0.2;
                 const bgWidth = width * bgScale, bgHeight = height * bgScale;
                 const bgLeft = left + (borderWidth - bgWidth) / 2, bgTop = pendding + (borderHeight - bgHeight);
@@ -141,22 +141,20 @@ export default class BoxText {
                 ctx.fillRect(bgLeft, bgTop, bgWidth, bgHeight);
 
                 const textLeft = left + (borderWidth - width) / 2, textTop = pendding + (borderHeight - height) / 2;
-                ctx.fillStyle = COLORS.WHITE;
-                ctx.fillText(char, textLeft, textTop);
+                ctx.drawImage(charImage, textLeft, textTop);
 
                 left += borderWidth * BOX_SCALE;
             } else {
                 const topOffset = canvasHeight / 2 ;
 
                 const BOX_SCALE = 1.2;
-                _.canvasRotate(canvas, ctx, angle);
+                // _.canvasRotate(canvas, ctx, angle);
                 const bgWidth = width * BOX_SCALE, bgHeight = height * BOX_SCALE;
                 ctx.fillStyle = COLORS.BLACK;
                 ctx.fillRect(left, topOffset, bgWidth, bgHeight);
 
                 const textLeft = left + (bgWidth - width) / 2, textTop = topOffset + (bgWidth - height) / 2;
-                ctx.fillStyle = mode == CHAR_MODE.RED ? COLORS.RED : COLORS.WHITE;
-                ctx.fillText(char, textLeft, textTop);
+                ctx.drawImage(charImage, textLeft, textTop);
 
                 left += bgWidth * BOX_SCALE;
             }
