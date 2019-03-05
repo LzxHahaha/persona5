@@ -10,7 +10,7 @@ function getCanvasAndContext(width: number, height: number) {
     return { canvas, context };
 }
 
-export function textToImage(char: string, fontSize: number, color: string, fontFamily = 'sans-serif', fontWeight = 'normal') {
+export function getCharSize(char: string, fontSize: number, color: string, fontFamily = 'sans-serif', fontWeight = 'normal') {
     const { canvas, context: ctx } = getCanvasAndContext(fontSize, fontSize);
 
     const font = `${fontWeight} ${fontSize}px ${fontFamily}`;
@@ -48,19 +48,12 @@ export function textToImage(char: string, fontSize: number, color: string, fontF
         }
     }
     
-    // TODO: 不要转成图片，改成返回 { height, width, top, left }
-    const textWidth = right - left, textHeight = bottom - top;
-    const { canvas: cutCanvas, context: cutCtx } = getCanvasAndContext(textWidth, textHeight);
-    const cutImg = new Image();
-    cutImg.src = canvas.toDataURL();
-    cutCtx.drawImage(cutImg, left, top, textWidth, textHeight, 0, 0, textWidth, textHeight);
-    
-    const resImage = new Image();
-    resImage.src = cutCanvas.toDataURL();
+    const width = right - left, height = bottom - top;
     return {
-        image: resImage,
-        width: textWidth,
-        height: textHeight
+        top,
+        left,
+        width,
+        height
     };
 }
 
@@ -68,9 +61,7 @@ export function randomOp() {
     return Math.floor(Math.random() * 10) % 2 ? 1 : -1;
 }
 
-export function canvasRotate(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, angle: number) {
-    const x = canvas.width / 2, y = canvas.height / 2;
-    context.translate(x, y);
+// TODO: 传入旋转中心点
+export function canvasRotate(context: CanvasRenderingContext2D, angle: number) {
     context.rotate(Math.PI * angle / 180);
-    context.translate(-x, -y);
 }

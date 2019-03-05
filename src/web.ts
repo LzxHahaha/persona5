@@ -1,8 +1,8 @@
-import BoxText from './lib/index';
+import BoxText from './lib/box/BoxText';
 
 export default () => {
     const input = <HTMLInputElement>document.getElementById('input');
-    input.value = 'Persona5';
+    input.value = 'ABCD';
     const goButton = <HTMLInputElement>document.getElementById('goButton');
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
