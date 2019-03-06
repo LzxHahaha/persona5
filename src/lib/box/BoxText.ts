@@ -1,27 +1,27 @@
 import * as _ from '../utils';
-import IBoxChar, { CHAR_MODE, COLORS } from './IBoxChar';
-import BoxSpaceChar from './BoxSpaceChar';
-import BoxChar from './BoxChar';
+import BoxChar, { CHAR_MODE, COLORS } from './BoxChar';
 
 interface BoxTextOptions {
     fontSize?: number,
-    fontFamily?: string
+    fontFamily?: string,
+    gutter?: number,
+    pendding?: number,
 }
 
 export default class BoxText {
-    private chars: Array<IBoxChar> = [];
+    private chars: Array<BoxChar> = [];
     private fontSize = 60;
     private fontFamily = 'sans-serif';
-
-    get font() {
-        return `bold ${this.fontSize}px ${this.fontFamily}`;
-    }
+    private gutter = 3;
+    private pendding = 30;
 
     constructor(text: string, options?: BoxTextOptions) {
         if (options) {
-            const { fontSize, fontFamily } = options;
+            const { fontSize, fontFamily, gutter, pendding } = options;
             fontSize && (this.fontSize = fontSize);
             fontFamily && (this.fontFamily = fontFamily);
+            gutter && (this.gutter = gutter);
+            pendding && (this.pendding = pendding);
         }
         if (!text) {
             throw new Error('Must set text.');
@@ -31,9 +31,9 @@ export default class BoxText {
         const modes = new Array<number>(chars.length).fill(CHAR_MODE.WHITE);
         modes[0] = CHAR_MODE.FIRST;
         // 随机选择标红的字，一定范围内只允许出现一次
-        for (let i = 1; i < this.chars.length; i += 7) {
-            for (let j = i; j < i + 6 && j < this.chars.length; ++j) {
-                if (Math.random() * 10 > 5) {
+        for (let i = 1; i < chars.length; i += 7) {
+            for (let j = i; j < i + 6 && j < chars.length; ++j) {
+                if (Math.random() * 10 > 7) {
                     modes[j] = CHAR_MODE.RED;
                     break;
                 }
@@ -42,9 +42,9 @@ export default class BoxText {
 
         for (const [index, char] of chars.entries()) {
             if (/^\s$/.test(char)) {
-                this.chars.push(new BoxSpaceChar(this.fontSize));
+                this.chars.push(new BoxChar('', CHAR_MODE.SPACE));
             } else {
-                this.chars.push(new BoxChar(char, modes[index], this.fontSize));
+                this.chars.push(new BoxChar(char, modes[index], this.fontSize, this.fontFamily));
             }
         }
     }
@@ -55,82 +55,71 @@ export default class BoxText {
             throw new Error('Failed to create canvas');
         }
 
-        const pendding = 10;
+        const pendding = this.pendding, gutter = this.gutter;
         
         let canvasWidth = pendding * 2, canvasHeight = 0;
-        // TODO: 修正宽高计算
         for (const boxChar of this.chars) {
             if (boxChar instanceof BoxChar) {
-                let { width, height, scale, angle } = boxChar;
-                width *= scale;
-                height *= scale;
-                canvasWidth += width;
-                canvasHeight = Math.max(canvasHeight, height);
-                
-                // const sin = Math.abs(Math.sin(angle)), cos = Math.abs(Math.cos(angle));
-                // const charWidth = width * cos + height * sin;
-                // const charHeight = height * cos + width * sin;
-                // canvasWidth += charWidth;
-                // canvasHeight = Math.max(canvasHeight, charHeight);
+                const size = boxChar.outterSize;
+                canvasWidth += (size.width + gutter);
+                canvasHeight = Math.max(canvasHeight, size.height);
             } else {
-                canvasWidth += boxChar.fontSize / 2;
+                canvasWidth += 2 * gutter;
             }
         }
 
-        canvas.height = canvasHeight * 2;
-        canvas.width = canvasWidth * 2;
+        canvas.height = canvasHeight + pendding * 2;
+        canvas.width = canvasWidth;
 
-        ctx.font = this.font;
         ctx.fillStyle = COLORS.BLACK;
         ctx.textBaseline = 'top';
-        ctx.font = this.font;
 
-        // TODO: 修正边框计算
         let drawOffset = pendding;
         for (const boxChar of this.chars) {
+            if (boxChar.mode == CHAR_MODE.SPACE) {
+                drawOffset += 2 * gutter;
+                continue;
+            }
+            
             ctx.save();
+            let { char, top, left, width, height, angle, mode, color } = boxChar;
 
-            if (boxChar instanceof BoxChar) {
-                let { char, top, left, width, height, angle, scale, mode, color } = boxChar;
-                ctx.scale(scale, scale);
-                
-                if (mode == CHAR_MODE.FIRST) {
-                    _.canvasRotate(ctx, angle - 3);
-                    const borderWidth = width * scale, borderHeight = height * scale;
-                    ctx.fillStyle = COLORS.BLACK;
-                    ctx.fillRect(drawOffset, pendding, borderWidth, borderHeight);
+            if (mode == CHAR_MODE.FIRST) {
+                const { width: borderWidth, height: borderHeight } = boxChar.outterSize;
+                const rotateX = drawOffset + borderWidth / 2, rotateY = pendding + borderHeight / 2;
+                _.canvasRotate(ctx, angle - 3, rotateX, rotateY);
+                ctx.fillStyle = COLORS.BLACK;
+                ctx.fillRect(drawOffset, pendding, borderWidth, borderHeight);
 
-                    _.canvasRotate(ctx, 1.5);
-                    const bgScale = scale * 0.85;
-                    const bgWidth = width * bgScale, bgHeight = height * bgScale;
-                    const bgLeft = drawOffset + (borderWidth - bgWidth) / 2, bgTop = pendding + (borderHeight - bgHeight) / 2;
-                    ctx.fillStyle = COLORS.RED;
-                    ctx.fillRect(bgLeft, bgTop, bgWidth, bgHeight);
+                _.canvasRotate(ctx, 2, rotateX, rotateY);
+                const bgScale = 0.85;
+                const bgWidth = borderWidth * bgScale, bgHeight = borderHeight * bgScale;
+                const bgLeft = drawOffset + (borderWidth - bgWidth) / 2, bgTop = pendding + (borderHeight - bgHeight) / 2;
+                ctx.fillStyle = COLORS.RED;
+                ctx.fillRect(bgLeft, bgTop, bgWidth, bgHeight);
 
-                    _.canvasRotate(ctx, 1.5);
-                    const textLeft = drawOffset + (borderWidth - width) - left, textTop = pendding + borderHeight - height - top;
-                    ctx.fillStyle = color;
-                    ctx.fillText(char, textLeft, textTop);
+                _.canvasRotate(ctx, 1, rotateX, rotateY);
+                const textLeft = drawOffset + (borderWidth - width) / 2 - left, textTop = pendding + (canvasHeight - height) / 2 - top;
+                ctx.fillStyle = color;
+                ctx.font = boxChar.font;
+                ctx.fillText(char, textLeft, textTop);
 
-                    _.canvasRotate(ctx, -angle);
-                    drawOffset += borderWidth * scale;
-                } else {
-                    const topOffset = canvasHeight / 2 ;
-
-                    _.canvasRotate(ctx, angle);
-                    const bgWidth = width * 1.2, bgHeight = height * 1.2;
-                    ctx.fillStyle = COLORS.BLACK;
-                    ctx.fillRect(drawOffset, topOffset, bgWidth, bgHeight);
-
-                    const textLeft = drawOffset + (bgWidth - width) / 2 - left, textTop = topOffset + (bgWidth - height) / 2 - top;
-                    ctx.fillStyle = color;
-                    ctx.fillText(char, textLeft, textTop);
-
-                    _.canvasRotate(ctx, -angle);
-                    drawOffset += bgWidth * 1.2;
-                }
+                drawOffset += boxChar.outterSize.width + gutter;
             } else {
-                drawOffset += boxChar.fontSize / 2;
+                const { width: bgWidth, height: bgHeight } = boxChar.outterSize;
+
+                const rotateX = drawOffset + bgWidth / 2, rotateY = pendding + bgHeight / 2;
+                _.canvasRotate(ctx, angle + 1, rotateX, rotateY);
+                ctx.fillStyle = COLORS.BLACK;
+                ctx.fillRect(drawOffset, pendding + (canvasHeight - bgHeight) / 2, bgWidth, bgHeight);
+
+                const textLeft = drawOffset + (bgWidth - width) / 2 - left, textTop = pendding + (canvasHeight - height) / 2 - top;
+                _.canvasRotate(ctx, -1, rotateX, rotateY);
+                ctx.fillStyle = color;
+                ctx.font = boxChar.font;
+                ctx.fillText(char, textLeft, textTop);
+
+                drawOffset += boxChar.outterSize.width + gutter;
             }
 
             ctx.restore();

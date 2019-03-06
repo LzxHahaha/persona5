@@ -1,4 +1,4 @@
-function getCanvasAndContext(width: number, height: number) {
+export function getCanvasAndContext(width: number, height: number) {
     const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
@@ -11,14 +11,13 @@ function getCanvasAndContext(width: number, height: number) {
 }
 
 export function getCharSize(char: string, fontSize: number, color: string, fontFamily = 'sans-serif', fontWeight = 'normal') {
-    const { canvas, context: ctx } = getCanvasAndContext(fontSize, fontSize);
+    const { context: ctx } = getCanvasAndContext(fontSize, fontSize);
 
     const font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.font = font;
     ctx.textBaseline = 'top';
     ctx.fillStyle = color;
-    // 要真有宽度超过的就压一压
-    ctx.fillText(char, 0, 0, fontSize);
+    ctx.fillText(char, 0, 0);
 
     let count = 0;
     let left = -1, right = fontSize, top = -1, bottom = fontSize;
@@ -61,7 +60,8 @@ export function randomOp() {
     return Math.floor(Math.random() * 10) % 2 ? 1 : -1;
 }
 
-// TODO: 传入旋转中心点
-export function canvasRotate(context: CanvasRenderingContext2D, angle: number) {
+export function canvasRotate(context: CanvasRenderingContext2D, angle: number, x: number, y: number) {
+    context.translate(x, y);
     context.rotate(Math.PI * angle / 180);
+    context.translate(-x, -y);
 }
