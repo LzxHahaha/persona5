@@ -3,7 +3,7 @@ import * as _ from '../utils';
 const MAX_ANGLE = 10;
 
 export enum COLORS {
-    RED = '#DA362C',
+    RED = '#E5191C',
     WHITE = '#FDFDFD',
     BLACK = '#0F0F0F',
 };
