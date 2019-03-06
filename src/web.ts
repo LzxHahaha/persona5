@@ -1,18 +1,25 @@
 import BoxText from './lib/box/BoxText';
 
 export default () => {
-    const input = <HTMLInputElement>document.getElementById('input');
-    input.value = '女神異聞錄ペルソナ 5';
+    const contentInput = <HTMLInputElement>document.getElementById('contentInput');
+    const fontSizeInput = <HTMLInputElement>document.getElementById('fontSizeInput');
+    const fontFamilyInput = <HTMLInputElement>document.getElementById('fontFamilyInput');
+
     const goButton = <HTMLInputElement>document.getElementById('goButton');
     const saveButton = <HTMLInputElement>document.getElementById('saveButton');
     const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
     goButton.addEventListener('click', () => {
-        const value = (input.value || '').trim();
+        const value = (contentInput.value || '').trim();
         if (!value) {
             return;
         }
-        const box = new BoxText(value);
+        const fontSize = Math.min(Math.abs(+fontSizeInput.value || 60));
+        const fontFamily = fontFamilyInput.value || 'sans-serif';
+        const box = new BoxText(value, {
+            fontSize,
+            fontFamily
+        });
         box.draw(canvas);
     });
 
@@ -20,7 +27,7 @@ export default () => {
         const imageURL = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
         const a = document.createElement('a');
         a.href = imageURL;
-        a.download = `${input.value}.png`;
+        a.download = `${contentInput.value}.png`;
         a.target = 'blank';
         a.click();
     });

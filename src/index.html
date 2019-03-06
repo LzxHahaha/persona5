@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <title>Persona 5</title>
     <style>
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            margin: 0;
-            padding: 0;
-        }
-
         #canvas {
             background-color: rgb(169, 170, 169);
         }
@@ -19,16 +11,20 @@
 </head>
 <body>
     <div>
-        <input id="input" placeholder="Text here">
+        Content: <input id="contentInput" value="女神異聞錄ペルソナ 5">
+        &emsp;&emsp;&emsp;
+        Font size: <input id="fontSizeInput" value="60" type="number">
+        &emsp;&emsp;&emsp;
+        Font family: <input id="fontFamilyInput" value="sans-serif">
+    </div>
+
+    <div style="margin: 10px 0">
         <button id="goButton">GO</button>
         <button id="saveButton">Save</button>
     </div>
+
     <canvas id="canvas"></canvas>
 
-    <script>
-        // for test
-        // Math.random = function () { return 1; };
-    </script>
     <script src="./index.ts"></script>
 </body>
 </html>

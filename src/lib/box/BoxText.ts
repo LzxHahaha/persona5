@@ -31,9 +31,10 @@ export default class BoxText {
         const modes = new Array<number>(chars.length).fill(CHAR_MODE.WHITE);
         modes[0] = CHAR_MODE.FIRST;
         // 随机选择标红的字，一定范围内只允许出现一次
-        for (let i = 1; i < chars.length; i += 7) {
-            for (let j = i; j < i + 6 && j < chars.length; ++j) {
-                if (Math.random() * 10 > 7) {
+        const range = 5;
+        for (let i = 1; i < chars.length; i += range) {
+            for (let j = i; j < i + range - 1 && j < chars.length; ++j) {
+                if (Math.random() * 10 > 6) {
                     modes[j] = CHAR_MODE.RED;
                     break;
                 }
