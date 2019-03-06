@@ -12,7 +12,7 @@ export default class BoxText {
     private chars: Array<BoxChar> = [];
     private fontSize = 60;
     private fontFamily = 'sans-serif';
-    private gutter = 3;
+    private gutter = 5;
     private pendding = 30;
 
     constructor(text: string, options?: BoxTextOptions) {
@@ -67,14 +67,16 @@ export default class BoxText {
                 canvasWidth += 2 * gutter;
             }
         }
+        let drawOffset = 0.15 * canvasWidth;
+        canvasHeight = (canvasHeight + pendding * 2) * 1.3;
+        canvasWidth *= 1.3;
 
-        canvas.height = canvasHeight + pendding * 2;
+        canvas.height = canvasHeight;
         canvas.width = canvasWidth;
 
         ctx.fillStyle = COLORS.BLACK;
         ctx.textBaseline = 'top';
 
-        let drawOffset = pendding;
         for (const boxChar of this.chars) {
             if (boxChar.mode == CHAR_MODE.SPACE) {
                 drawOffset += 2 * gutter;
@@ -89,17 +91,17 @@ export default class BoxText {
                 const rotateX = drawOffset + borderWidth / 2, rotateY = pendding + borderHeight / 2;
                 _.canvasRotate(ctx, angle - 3, rotateX, rotateY);
                 ctx.fillStyle = COLORS.BLACK;
-                ctx.fillRect(drawOffset, pendding, borderWidth, borderHeight);
+                ctx.fillRect(drawOffset, (canvasHeight - borderHeight) / 2, borderWidth, borderHeight);
 
                 _.canvasRotate(ctx, 2, rotateX, rotateY);
                 const bgScale = 0.85;
                 const bgWidth = borderWidth * bgScale, bgHeight = borderHeight * bgScale;
-                const bgLeft = drawOffset + (borderWidth - bgWidth) / 2, bgTop = pendding + (borderHeight - bgHeight) / 2;
+                const bgLeft = drawOffset + (borderWidth - bgWidth) / 2, bgTop = (canvasHeight - bgHeight) / 2;
                 ctx.fillStyle = COLORS.RED;
                 ctx.fillRect(bgLeft, bgTop, bgWidth, bgHeight);
 
                 _.canvasRotate(ctx, 1, rotateX, rotateY);
-                const textLeft = drawOffset + (borderWidth - width) / 2 - left, textTop = pendding + (canvasHeight - height) / 2 - top;
+                const textLeft = drawOffset + (borderWidth - width) / 2 - left, textTop = (canvasHeight - height) / 2 - top;
                 ctx.fillStyle = color;
                 ctx.font = boxChar.font;
                 ctx.fillText(char, textLeft, textTop);
@@ -111,9 +113,9 @@ export default class BoxText {
                 const rotateX = drawOffset + bgWidth / 2, rotateY = pendding + bgHeight / 2;
                 _.canvasRotate(ctx, angle + 1, rotateX, rotateY);
                 ctx.fillStyle = COLORS.BLACK;
-                ctx.fillRect(drawOffset, pendding + (canvasHeight - bgHeight) / 2, bgWidth, bgHeight);
+                ctx.fillRect(drawOffset, (canvasHeight - bgHeight) / 2, bgWidth, bgHeight);
 
-                const textLeft = drawOffset + (bgWidth - width) / 2 - left, textTop = pendding + (canvasHeight - height) / 2 - top;
+                const textLeft = drawOffset + (bgWidth - width) / 2 - left, textTop = (canvasHeight - height) / 2 - top;
                 _.canvasRotate(ctx, -1, rotateX, rotateY);
                 ctx.fillStyle = color;
                 ctx.font = boxChar.font;
@@ -124,5 +126,26 @@ export default class BoxText {
 
             ctx.restore();
         }
+
+        const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+        for (let i = 0; i < imageData.data.length; i += 4) {
+            if (imageData.data[i + 3]) {
+                imageData.data[i] = 0;
+                imageData.data[i + 1] = 255;
+                imageData.data[i + 2] = 255;
+                imageData.data[i + 3] = 255;
+            }
+        }
+        const { canvas: borderCanvas, context: borderCtx } = _.getCanvasAndContext(canvasWidth, canvasHeight);
+        borderCtx.putImageData(imageData, 0, 0);
+        document.body.appendChild(borderCanvas);
+        const borderImg = new Image();
+        borderImg.src = borderCanvas.toDataURL();
+
+        ctx.save();
+        ctx.globalCompositeOperation = '';
+        ctx.scale(2, 2);
+        ctx.drawImage(borderImg, 0, 0);
+        ctx.restore();
     }
 }
