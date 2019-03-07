@@ -9,10 +9,12 @@
   "private": false,
   "scripts": {
     "start": "parcel serve src/index.html",
-    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url ."
+    "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
+    "publish": "npm run build && node ./publish.js"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
+    "gh-pages": "^2.0.1",
     "parcel": "^1.11.0",
     "typescript": "^3.3.3333"
   }
