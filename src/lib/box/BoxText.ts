@@ -131,8 +131,8 @@ export default class BoxText {
         const newImageData = ctx.createImageData(canvasWidth, canvasHeight);
 
         const coreSize = 6, start = Math.floor(coreSize / 2);
-        for (let i = start; i < imageData.height - 1; ++i) {
-            for (let j = start; j < imageData.width - 1; ++j) {
+        for (let i = start; i < imageData.height - start; ++i) {
+            for (let j = start; j < imageData.width - start; ++j) {
                 const index = i * imageData.width * 4 + j * 4;
                 if (!imageData.data[index + 3]) {
                     continue;
