@@ -10,13 +10,12 @@ export function getCanvasAndContext(width: number, height: number) {
     return { canvas, context };
 }
 
-export function getCharSize(char: string, fontSize: number, color: string, fontFamily = 'sans-serif', fontWeight = 'normal') {
+export function getCharSize(char: string, fontSize: number, fontFamily = 'sans-serif', fontWeight = 'normal') {
     const { context: ctx } = getCanvasAndContext(fontSize, fontSize);
 
     const font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.font = font;
     ctx.textBaseline = 'top';
-    ctx.fillStyle = color;
     ctx.fillText(char, 0, 0);
 
     let count = 0;

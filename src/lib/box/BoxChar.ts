@@ -54,7 +54,7 @@ export default class BoxChar {
             this.color = COLORS.RED;
         }
         
-        const { width, height, top, left } = _.getCharSize(char, this.fontSize, this.color, this.fontFamily, 'bold');
+        const { width, height, top, left } = _.getCharSize(char, this.fontSize, this.fontFamily, 'bold');
         this.width = width;
         this.height = height;
         this.top = top;
