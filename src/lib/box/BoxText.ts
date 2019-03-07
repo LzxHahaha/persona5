@@ -157,6 +157,20 @@ export default class BoxText {
         ctx.save();
         ctx.globalCompositeOperation = 'destination-over';
         ctx.drawImage(borderCanvas, 0, 0);
+
+        const step = canvasWidth / 10;
+        let width = step;
+        let isRed = true;
+        while (width < canvasWidth) {
+            ctx.beginPath();
+            ctx.arc(canvasWidth / 2, canvasHeight / 2, width, 0, 360);
+            ctx.closePath();
+            ctx.fillStyle = isRed ? COLORS.RED : COLORS.BLACK;
+            isRed = !isRed;
+            ctx.fill();
+            width += step;
+        }
+
         ctx.restore();
     }
 }
