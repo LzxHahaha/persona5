@@ -22,6 +22,7 @@ export default () => {
         });
         box.draw(canvas);
     });
+    goButton.click();
 
     saveButton.addEventListener('click', () => {
         const imageURL = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');

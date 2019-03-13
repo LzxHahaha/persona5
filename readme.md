@@ -1,5 +1,7 @@
 # Persona 5 style font generator
 
+![demo](./demo.png)
+
 ## Run
 
 ```bash
