@@ -1252,8 +1252,8 @@ clone@^2.1.1:
 
 clones@^1.2.0:
   version "1.2.0"
-  resolved "http://registry.npm.taobao.org/clones/download/clones-1.2.0.tgz#b34c872045446a9f264ccceb7731bca05c529b71"
-  integrity sha1-s0yHIEVEap8mTMzrdzG8oFxSm3E=
+  resolved "https://registry.yarnpkg.com/clones/-/clones-1.2.0.tgz#b34c872045446a9f264ccceb7731bca05c529b71"
+  integrity sha512-FXDYw4TjR8wgPZYui2LeTqWh1BLpfQ8lB6upMtlpDF6WlOOxghmTTxWyngdKTgozqBgKnHbTVwTE+hOHqAykuQ==
 
 coa@^2.0.2:
   version "2.0.2"
@@ -4404,9 +4404,9 @@ safe-regex@^1.1.0:
   integrity sha1-RPoWGwGHuVSd2Eu5GAL5vYOFzWo=
 
 safer-eval@^1.3.0:
-  version "1.3.1"
-  resolved "http://registry.npm.taobao.org/safer-eval/download/safer-eval-1.3.1.tgz#737ec26c6121b4115c97bd0c1da021eaaf4214e3"
-  integrity sha1-c37CbGEhtBFcl70MHaAh6q9CFOM=
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/safer-eval/-/safer-eval-1.3.6.tgz#ee51e3348c39fdc4117a47dfb4b69df56a2e40cf"
+  integrity sha512-DN9tBsZgtUOHODzSfO1nGCLhZtxc7Qq/d8/2SNxQZ9muYXZspSh1fO7HOsrf4lcelBNviAJLCxB/ggmG+jV1aw==
   dependencies:
     clones "^1.2.0"
 
